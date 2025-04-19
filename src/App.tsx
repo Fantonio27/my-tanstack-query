@@ -40,7 +40,7 @@ function App() {
   } = useQuery({
     queryKey: ["users"],
     queryFn: userService.getUsers,
-    staleTime: 2000,
+    staleTime: 1000,
   });
 
   const { mutateAsync: createUserMutate, isPending } = useMutation({
