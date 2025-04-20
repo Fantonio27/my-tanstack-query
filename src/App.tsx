@@ -2,6 +2,8 @@ import { use, useEffect, useState } from "react";
 import "./App.css";
 import { userService, type User } from "./data/users";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Footer from "./components/Footer";
+import { useUser } from "./hooks/query/users";
 
 // function fetchUsers() {
 //   const [loading, setLoading] = useState(false);
@@ -37,11 +39,7 @@ function App() {
     data: users,
     isPending: loading,
     refetch: refetchUsers,
-  } = useQuery({
-    queryKey: ["users"],
-    queryFn: userService.getUsers,
-    staleTime: 1000,
-  });
+  } = useUser()
 
   const { mutateAsync: createUserMutate, isPending } = useMutation({
     mutationFn: userService.postUser,
@@ -74,7 +72,9 @@ function App() {
     <>
       <section>
         {!isHide ? <Header /> : <h1>User</h1>}
-        <button onClick={() => setIsHide(!isHide)}>{isHide? "Show Users" : "Hide Users"}</button>
+        <button onClick={() => setIsHide(!isHide)}>
+          {isHide ? "Show Users" : "Hide Users"}
+        </button>
         <button onClick={handleClick}>Create User</button>
         <button onClick={handleShow}>Load</button>
       </section>
@@ -92,23 +92,28 @@ function App() {
           );
         })
       )}
+
+      <Footer></Footer>
     </>
   );
 }
 
 function Header() {
-  const { data: users } = useQuery({ queryKey: ["users"], queryFn: userService.getUsers });
+  const { data: users } = useQuery({
+    queryKey: ["users"],
+    queryFn: userService.getUsers,
+  });
 
   const queryClient = useQueryClient();
 
-  function handleInvalidateUsers(){
-    queryClient.resetQueries({queryKey: ["users"]})
+  function handleInvalidateUsers() {
+    queryClient.resetQueries({ queryKey: ["users"] });
   }
 
   return (
     <>
-    <h1>Users Record ({users?.length})</h1>
-    <button onClick={handleInvalidateUsers}>Invalidate Users</button>
+      <h1>Users Record ({users?.length})</h1>
+      <button onClick={handleInvalidateUsers}>Invalidate Users</button>
     </>
   );
 }
